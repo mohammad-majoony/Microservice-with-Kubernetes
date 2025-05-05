@@ -10,7 +10,7 @@ def get_all_tasks(request):
 
     user = request.user
 
-    tasks = Task.objects.all().filter(author=user).order_by('created_date')
+    tasks = Task.objects.all().filter(owner=user).order_by('created_date')
     serializers = TaskSerializer(tasks, many=True)
 
     return Response(serializers.data)
@@ -20,7 +20,7 @@ def get_all_tasks(request):
 def get_task(request, pk):
     try:
         user = request.user
-        task = task.objects.get(pk=pk)
+        task = Task.objects.get(pk=pk)
 
         if task.owner != user:
             raise Exception
@@ -52,16 +52,20 @@ def remove_task(request, pk):
 
 @api_view(['POST'])
 def add_task(request):
-    owner = request.data.get('owner')
-    title = request.data.get('title')
-    description = request.data.get('description')
+    try:
+        owner = request.user
+        title = request.data.get('title')
+        description = request.data.get('description')
 
-    task = Task.objects.create(
-        owner = owner,
-        title = title,
-        description = description,
-    )
+        task = Task.objects.create(
+            owner = owner,
+            title = title,
+            description = description,
+        )
 
-    task.save()
-    serializer = TaskSerializer(task, many=False)
-    return Response(serializer.data)
+        task.save()
+        serializer = TaskSerializer(task, many=False)
+        return Response(serializer.data)
+    except:
+        message = {'detail': 'Can not add task this time'}
+        return Response(message, status=status.HTTP_404_NOT_FOUND)
