@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .task {
+            border: 1px solid #aaa;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            background-color: #f0f0f0;
+        }
+        .status {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task Details</h1>
+
+    <div class="task">
+        <p><strong>ID:</strong> {{ task.id }}</p>
+        <p><strong>Title:</strong> {{ task.title }}</p>
+        <p><strong>Description:</strong> {{ task.description }}</p>
+        <p class="status">
+            <strong>Status:</strong>
+            {% if task.is_complete %}
+                ✅ Completed
+            {% else %}
+                ⏳ Incomplete
+            {% endif %}
+        </p>
+    </div>
+</body>
+</html>
