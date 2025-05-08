@@ -8,13 +8,15 @@ from .models import Task
 
 @api_view(['GET'])
 def get_all_tasks(request):
+    try:
+        user = request.user
 
-    user = request.user
+        tasks = Task.objects.all().filter(owner=user).order_by('created_date')
+        serializers = TaskSerializer(tasks, many=True)
 
-    tasks = Task.objects.all().filter(owner=user).order_by('created_date')
-    serializers = TaskSerializer(tasks, many=True)
-
-    return render(request, 'task_list.html', {'tasks': serializers.data})
+        return render(request, 'task_list.html', {'tasks': serializers.data})
+    except:
+        return redirect('login_user')
 
 
 @api_view(['GET'])
@@ -29,7 +31,7 @@ def get_task(request, pk):
         serializer = TaskSerializer(task, many=False)
         return render(request, 'task_detail.html', {'task': serializer.data})
     except:
-        message = {'detail': 'No task found with this id'}
+        message = {'detail': 'No task found with this id for you'}
         return render(request, '404.html', message)
 
 

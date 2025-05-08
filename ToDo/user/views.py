@@ -1,53 +1,33 @@
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from rest_framework.decorators import api_view, permission_classes
 from .serializers import UserSerializer, UserSerializerWithToken
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework import status
 
-from rest_framework.permissions import AllowAny
 
-@api_view(['POST'])
 def login_user(request):
-    data = request.data
-    username = data.get('username')
-    password = data.get('password')
-    user = authenticate(username=username, password=password)
-
-    if user is not None:
-        login(request, user)
-        serializer = UserSerializerWithToken(user, many=False)
-        return Response(serializer.data)
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('get_all_tasks')  
     else:
-        message = {'detail': 'invalid username or password!'}
-        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
 def register_user(request):
-    try:
-        data = request.data
-        user = User.objects.create(
-            first_name = data.get('first_name'),
-            last_name = data.get('last_name'),
-            username = data.get('email'),
-            email = data.get('email'),
-            password = make_password(data.get('password')) 
-        )
-        
-        serializer = UserSerializerWithToken(user, many=False)
-        return Response(serializer.data)
-    except:
-        message = {'detail': 'Can not register user! try again'}
-        return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_user_profile(request):
-    user = request.user
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save() 
+            return redirect('login_user') 
+    else:
+        form = UserCreationForm()
+    return render(request, 'register.html', {'form': form})
