@@ -7,27 +7,68 @@
             font-family: Arial, sans-serif;
             margin: 40px;
         }
+
         .task {
             border: 1px solid #ccc;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 10px;
             background-color: #f9f9f9;
+            position: relative;
         }
+
         .completed {
             background-color: #d4edda;
         }
+
         .title {
             font-weight: bold;
             font-size: 1.2em;
         }
+
         .description {
             margin-top: 5px;
         }
+
         .status {
             margin-top: 10px;
             font-size: 0.9em;
             color: #555;
+        }
+
+        .actions {
+            margin-top: 15px;
+        }
+
+        .actions form {
+            display: inline;
+        }
+
+        .actions button {
+            margin-right: 10px;
+            padding: 6px 10px;
+            font-size: 0.9em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .complete-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .complete-btn:hover {
+            background-color: #0056b3;
         }
 
         /* Floating Add Button */
@@ -57,8 +98,8 @@
     <h1>My Todo Tasks</h1>
 
     {% for task in tasks %}
-        <a href="{% url 'get_task' task.id %}" style="text-decoration: none; color: inherit;">
-            <div class="task {% if task.is_complete %}completed{% endif %}">
+        <div class="task {% if task.is_complete %}completed{% endif %}">
+            <a href="{% url 'get_task' task.id %}" style="text-decoration: none; color: inherit;">
                 <div class="title">{{ task.title }}</div>
                 <div class="description">{{ task.description }}</div>
                 <div class="status">
@@ -69,8 +110,24 @@
                         ⏳ Incomplete
                     {% endif %}
                 </div>
+            </a>
+            <div class="actions">
+                {% if task.is_completed %}
+                <!-- Show Undo button if task is completed -->
+                <form method="post" action="{% url 'complete_task' task.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="complete-btn">Reopen Task</button>
+                </form>
+                {% else %}
+                <!-- Show Complete button if task is not completed -->
+                <form method="post" action="{% url 'complete_task' task.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="complete-btn">Finish Task</button>
+                </form>
+                {% endif %}
+                <a href="{% url 'remove_task' task.id %}" class="delete-btn" style="text-decoration: none; padding: 6px 10px; border-radius: 4px;">Delete</a>
             </div>
-        </a>
+        </div>
     {% empty %}
         <p>No tasks to show!</p>
     {% endfor %}
@@ -78,6 +135,5 @@
 
     <!-- Floating Add Task Button -->
     <a href="{% url 'add_task' %}" class="fab">+</a>
-
 </body>
 </html>

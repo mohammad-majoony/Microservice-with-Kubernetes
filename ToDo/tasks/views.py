@@ -74,3 +74,11 @@ def add_task(request):
             return render(request, '404.html', message)
 
     return render(request, 'add_task.html')
+
+
+@api_view(['POST'])
+def complete_task(request, task_id):
+    task = Task.objects.get(pk=task_id)
+    task.is_completed = not task.is_completed
+    task.save()
+    return redirect('get_all_tasks')  
