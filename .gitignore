@@ -13,9 +13,7 @@ ENV/
 *.log
 *.pot
 *.mo
-*.sqlite3
 local_settings.py
-db.sqlite3
 
 # Static and media files (optional, if managed separately)
 /static/*
@@ -28,5 +26,3 @@ db.sqlite3
 *.swp
 *~
 .DS_Store
-
-credentials.py
