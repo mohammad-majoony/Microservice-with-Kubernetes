@@ -13,4 +13,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Run Django development server
-CMD ["python", "ToDo/manage.py", "runserver", "localhost:5000"]
+CMD ["python", "ToDo/manage.py", "runserver", "0.0.0.0:5000", "--noreload"]
